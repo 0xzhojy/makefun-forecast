@@ -10,7 +10,7 @@ Z = (-1.645, -0.674, 0.0, 0.674, 1.645)
 LEVELS = (0.05, 0.25, 0.5, 0.75, 0.95)
 
 # Logit spread per square root of a day, the floor a forecast may never go below.
-SIGMA_FLOOR_PER_SQRT_DAY = 4.0
+SIGMA_FLOOR_PER_SQRT_DAY = 8.0
 TAUS = (6, 12, 24, 48, 96, 192, 384)
 
 
