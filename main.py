@@ -10,7 +10,7 @@ Z = (-1.645, -0.674, 0.0, 0.674, 1.645)
 LEVELS = (0.05, 0.25, 0.5, 0.75, 0.95)
 
 # Logit spread per square root of a day, the floor a forecast may never go below.
-SIGMA_FLOOR_PER_SQRT_DAY = 4.0
+SIGMA_FLOOR_PER_SQRT_DAY = 2.5
 # The floor saturates: past a few logits a band says nothing, and the final case
 # asks for a four-day horizon where an unbounded floor would swallow every rate.
 SIGMA_FLOOR_CAP = 1.5
