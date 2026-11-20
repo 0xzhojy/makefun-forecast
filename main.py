@@ -10,7 +10,10 @@ Z = (-1.645, -0.674, 0.0, 0.674, 1.645)
 LEVELS = (0.05, 0.25, 0.5, 0.75, 0.95)
 
 # Logit spread per square root of a day, the floor a forecast may never go below.
-SIGMA_FLOOR_PER_SQRT_DAY = 8.0
+SIGMA_FLOOR_PER_SQRT_DAY = 4.0
+# The floor saturates: past a few logits a band says nothing, and the final case
+# asks for a four-day horizon where an unbounded floor would swallow every rate.
+SIGMA_FLOOR_CAP = 1.5
 TAUS = (6, 12, 24, 48, 96, 192, 384)
 
 
@@ -171,7 +174,7 @@ def forecast_case(case, name=None, diagnostics=None):
         # A floor that grows with the horizon: a flat history is no evidence that the rate
         # will stay flat, and a razor-sharp band on a moving page loses the pinball score
         # far more than an honest wide one gains. The backtest may only widen it.
-        floor = SIGMA_FLOOR_PER_SQRT_DAY * math.sqrt(max(0.0, horizon) / 24.0)
+        floor = min(SIGMA_FLOOR_CAP, SIGMA_FLOOR_PER_SQRT_DAY * math.sqrt(max(0.0, horizon) / 24.0))
         sigma = max(floor, sigma if sigma is not None else 0.0)
         if last <= 0.0 and not use_curve:
             # Preserve a zero median while allowing a meaningful upper band.
