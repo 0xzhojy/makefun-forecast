@@ -8,6 +8,9 @@ from pathlib import Path
 
 Z = (-1.645, -0.674, 0.0, 0.674, 1.645)
 LEVELS = (0.05, 0.25, 0.5, 0.75, 0.95)
+
+# Logit spread per square root of a day, the floor a forecast may never go below.
+SIGMA_FLOOR_PER_SQRT_DAY = 0.5
 TAUS = (6, 12, 24, 48, 96, 192, 384)
 
 
@@ -165,7 +168,11 @@ def forecast_case(case, name=None, diagnostics=None):
         sigma = spread(own, horizon)
         if sigma is None:
             sigma = spread(tier_errors.get(trophy.get('tier'), []), horizon)
-        sigma = max(0.05, sigma if sigma is not None else 0.05)
+        # A floor that grows with the horizon: a flat history is no evidence that the rate
+        # will stay flat, and a razor-sharp band on a moving page loses the pinball score
+        # far more than an honest wide one gains. The backtest may only widen it.
+        floor = SIGMA_FLOOR_PER_SQRT_DAY * math.sqrt(max(0.0, horizon) / 24.0)
+        sigma = max(floor, sigma if sigma is not None else 0.0)
         if last <= 0.0 and not use_curve:
             # Preserve a zero median while allowing a meaningful upper band.
             q = [0.0, 0.0, 0.0, logistic(center + Z[3] * sigma), logistic(center + Z[4] * sigma)]
